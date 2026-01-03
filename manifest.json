@@ -1,0 +1,100 @@
+{
+  "name": "Mouse Streaming Hub",
+  "short_name": "Mouse Stream",
+  "description": "منصة البث المباشر للقنوات الرياضية والأفلام بجودة عالية",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0ea5e9",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/732/732221.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/732/732221.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/732/732221.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/732/732221.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/732/732221.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/732/732221.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/732/732221.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/732/732221.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["entertainment", "sports", "video", "music"],
+  "lang": "ar",
+  "dir": "rtl",
+  "screenshots": [
+    {
+      "src": "https://via.placeholder.com/1920x1080/0f172a/0ea5e9?text=Mouse+Streaming+Hub",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Dashboard"
+    },
+    {
+      "src": "https://via.placeholder.com/1080x1920/0f172a/0ea5e9?text=Mobile+View",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile View"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "القنوات الرياضية",
+      "short_name": "رياضة",
+      "description": "مشاهدة القنوات الرياضية",
+      "url": "./index.html?category=sports",
+      "icons": [
+        {
+          "src": "https://cdn-icons-png.flaticon.com/512/857/857419.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "أفلام",
+      "short_name": "أفلام",
+      "description": "مشاهدة الأفلام",
+      "url": "./index.html?category=movies",
+      "icons": [
+        {
+          "src": "https://cdn-icons-png.flaticon.com/512/2991/2991663.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false
+}

@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="🐭🅜🅞🅤🅢🅔🐭 - Internal Play Hub | تطبيق بث مباشر متكامل للقنوات الرياضية والأفلام">
+    <title>🐭 Mouse Streaming Hub | منصة البث المباشر المتكاملة</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/732/732221.png" type="image/png">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'cairo': ['Cairo', 'sans-serif']
+                    },
+                    colors: {
+                        primary: '#0ea5e9',
+                        secondary: '#1e40af',
+                        dark: '#0f172a'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- مكتبة HLS -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script> 
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #0c4a6e, #0369a1, #0ea5e9);
+            --sports-gradient: linear-gradient(135deg, #dc2626, #ea580c);
+            --movies-gradient: linear-gradient(135deg, #7c3aed, #a855f7);
+            --arabic-gradient: linear-gradient(135deg, #059669, #10b981);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0c4a6e 100%);
+            min-height: 100vh;
+            background-attachment: fixed;
+        }
+
+        .glass-effect {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .channel-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(15, 23, 42, 0.9);
+            border: 2px solid rgba(6, 182, 212, 0.2);
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .channel-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .channel-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: #22d3ee;
+            box-shadow: 0 20px 40px rgba(6, 182, 212, 0.3);
+        }
+
+        .channel-card:hover::before {
+            opacity: 1;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #22d3ee, #3b82f6, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 300% 300%;
+            animation: gradient-shift 3s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #0ea5e9, #0369a1, #7c3aed);
+            border-radius: 10px;
+            border: 2px solid rgba(15, 23, 42, 0.5);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(14, 165, 233, 0.8);
+            }
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes live-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .live-pulse {
+            animation: live-pulse 2s infinite;
+        }
+
+        /* Quality Badges */
+        .quality-4k {
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .quality-fhd {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .quality-hd {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .quality-sd {
+            background: linear-gradient(135deg, #6b7280, #9ca3af);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* Category Indicators */
+        .category-sports::before {
+            background: linear-gradient(135deg, #dc2626, #ea580c);
+        }
+
+        .category-movies::before {
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+        }
+
+        .category-arabic::before {
+            background: linear-gradient(135deg, #059669, #10b981);
+        }
+
+        /* Video Player */
+        .video-container {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(14, 165, 233, 0.1), rgba(99, 102, 241, 0.1));
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Loading Animation */
+        .loading-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .loading-dots div {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #0ea5e9;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dots div:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots div:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .channel-card {
+                border-radius: 12px;
+            }
+            
+            .video-container {
+                border-radius: 12px;
+            }
+            
+            .glass-effect {
+                backdrop-filter: blur(8px);
+            }
+        }
+    </style>
+</head>
+<body class="text-white">
+    <!-- Loading Screen -->
+    <div id="loading" class="fixed inset-0 bg-gradient-to-br from-gray-900 via-blue-900 to-black z-50 flex flex-col items-center justify-center">
+        <div class="text-center">
+            <div class="text-7xl mb-6 animate-bounce">🐭</div>
+            <h1 class="text-4xl font-bold gradient-text mb-4">MOUSE STREAMING HUB</h1>
+            <p class="text-gray-300 mb-8">جارٍ تحميل المنصة البث المباشر المتكاملة</p>
+            
+            <div class="loading-dots justify-center mb-8">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            
+            <div class="w-64 h-2 bg-gray-800 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <p id="loading-text" class="text-sm text-gray-400 mt-4">جاري تحميل القنوات...</p>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="min-h-screen hidden">
+        <!-- Header -->
+        <header class="glass-effect p-4 md:p-6 border-b border-gray-800/50 sticky top-0 z-30">
+            <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-4 mb-4 md:mb-0">
+                    <div class="text-5xl pulse-glow">🐭</div>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold gradient-text">MOUSE STREAMING HUB</h1>
+                        <p class="text-sm text-gray-300">منصة البث المباشر المتكاملة</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div id="connection-status" class="flex items-center space-x-2 bg-green-900/30 px-4 py-2 rounded-full">
+                        <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                        <span class="text-sm">متصل</span>
+                        <span id="online-count" class="text-xs bg-green-800/50 px-2 py-1 rounded">0</span>
+                    </div>
+                    
+                    <button id="theme-toggle" class="p-3 bg-gray-800/50 hover:bg-gray-700/50 rounded-full transition">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    
+                    <button id="install-btn" class="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-full hover:opacity-90 transition hidden">
+                        <i class="fas fa-download mr-2"></i>تثبيت
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Player Section -->
+        <div class="container mx-auto p-4 md:p-6">
+            <div class="video-container mb-8">
+                <video id="video-player" controls class="w-full" style="aspect-ratio: 16/9;">
+                    متصفحك لا يدعم تشغيل الفيديو. يرجى استخدام متصفح حديث.
+                </video>
+                
+                <div id="player-placeholder" class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-black/90 to-gray-900/90">
+                    <div class="text-6xl mb-6">📺</div>
+                    <h3 class="text-2xl font-bold mb-3 gradient-text">مرحباً بك في منصة البث المباشر</h3>
+                    <p class="text-gray-300 mb-6 text-center max-w-lg">اختر قناة من القائمة أدناه لبدء المشاهدة</p>
+                    <div class="flex gap-4">
+                        <button onclick="app.playDemo()" class="px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-full hover:from-cyan-500 hover:to-blue-500 transition">
+                            <i class="fas fa-play mr-2"></i>عرض تجريبي
+                        </button>
+                        <button onclick="app.showTutorial()" class="px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-full border border-gray-700 transition">
+                            <i class="fas fa-info-circle mr-2"></i>كيفية الاستخدام
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Channel Info -->
+            <div id="channel-info" class="glass-effect rounded-2xl p-6 mb-8 hidden fade-in-up">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div class="flex items-center space-x-4 flex-1">
+                        <div id="channel-logo" class="text-4xl bg-gradient-to-br from-cyan-500 to-blue-500 p-4 rounded-2xl"></div>
+                        <div class="flex-1">
+                            <h3 id="channel-name" class="text-xl font-bold mb-2"></h3>
+                            <div class="flex flex-wrap gap-2">
+                                <span id="channel-quality" class="px-3 py-1 rounded-full text-sm font-bold"></span>
+                                <span id="channel-category" class="px-3 py-1 bg-gray-800 rounded-full text-sm"></span>
+                                <span id="channel-language" class="px-3 py-1 bg-gray-800 rounded-full text-sm"></span>
+                                <span class="flex items-center px-3 py-1 bg-red-900/30 rounded-full text-sm">
+                                    <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse mr-2"></span>
+                                    <span>مباشر</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button id="toggle-fav" class="px-6 py-3 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 rounded-full transition">
+                            <i class="far fa-heart"></i>
+                            <span class="mr-2">مفضلة</span>
+                        </button>
+                        <button onclick="app.toggleFullscreen()" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-full transition">
+                            <i class="fas fa-expand"></i>
+                            <span class="mr-2">ملء الشاشة</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="channel-stats" class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-gray-900/50 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold" id="bitrate">--</div>
+                        <div class="text-sm text-gray-400">معدل البت</div>
+                    </div>
+                    <div class="bg-gray-900/50 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold" id="resolution">--</div>
+                        <div class="text-sm text-gray-400">الدقة</div>
+                    </div>
+                    <div class="bg-gray-900/50 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold" id="buffer">--</div>
+                        <div class="text-sm text-gray-400">المخزون المؤقت</div>
+                    </div>
+                    <div class="bg-gray-900/50 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold" id="viewers">--</div>
+                        <div class="text-sm text-gray-400">المشاهدين</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="container mx-auto px-4 md:px-6 pb-12">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Left Column: Channels -->
+                <div class="lg:col-span-3">
+                    <!-- Filter Buttons -->
+                    <div class="glass-effect rounded-2xl p-6 mb-6">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div>
+                                <h2 class="text-2xl font-bold gradient-text mb-2">
+                                    <i class="fas fa-satellite-dish mr-3"></i>جميع القنوات المتاحة
+                                </h2>
+                                <p class="text-gray-400">إجمالي <span id="total-channels" class="font-bold text-cyan-400">0</span> قناة نشطة</p>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-3">
+                                <div class="relative">
+                                    <input type="text" id="search-channels" placeholder="ابحث عن قناة..." 
+                                           class="bg-gray-900/50 border border-gray-700 rounded-full px-6 py-3 pr-12 focus:outline-none focus:border-cyan-500 w-full md:w-auto">
+                                    <i class="fas fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="app.filterChannels('all')" class="px-5 py-3 bg-cyan-600 hover:bg-cyan-500 rounded-full transition active">الكل</button>
+                                    <button onclick="app.filterChannels('sports')" class="px-5 py-3 bg-gray-800 hover:bg-gray-700 rounded-full transition">
+                                        <i class="fas fa-futbol mr-2"></i>رياضية
+                                    </button>
+                                    <button onclick="app.filterChannels('movies')" class="px-5 py-3 bg-gray-800 hover:bg-gray-700 rounded-full transition">
+                                        <i class="fas fa-film mr-2"></i>أفلام
+                                    </button>
+                                    <button onclick="app.filterChannels('arabic')" class="px-5 py-3 bg-gray-800 hover:bg-gray-700 rounded-full transition">
+                                        <i class="fas fa-globe-africa mr-2"></i>عربية
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Channels Grid -->
+                    <div class="space-y-8">
+                        <!-- BeIN Sports Section -->
+                        <section class="fade-in-up">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-xl font-bold text-red-400">
+                                    <i class="fas fa-futbol mr-3"></i>beIN SPORTS MAX
+                                </h3>
+                                <div class="flex gap-2">
+                                    <button onclick="app.sortChannels('quality')" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 rounded-full text-sm">
+                                        <i class="fas fa-sort-amount-down mr-1"></i>الجودة
+                                    </button>
+                                    <button onclick="app.toggleCollapse('bein-section')" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 rounded-full text-sm">
+                                        <i class="fas fa-chevron-up"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="bein-section" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                <!-- سيتم ملؤها بالجافاسكريبت -->
+                            </div>
+                        </section>
+
+                        <!-- Algerian Channels Section -->
+                        <section class="fade-in-up">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-xl font-bold text-green-400">
+                                    <i class="fas fa-flag mr-3"></i>القنوات الجزائرية 🇩🇿
+                                </h3>
+                                <button onclick="app.toggleCollapse('algerian-section')" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 rounded-full text-sm">
+                                    <i class="fas fa-chevron-up"></i>
+                                </button>
+                            </div>
+                            
+                            <div id="algerian-section" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                <!-- سيتم ملؤها بالجافاسكريبت -->
+                            </div>
+                        </section>
+
+                        <!-- Rakuten Movies Section -->
+                        <section class="fade-in-up">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-xl font-bold text-purple-400">
+                                    <i class="fas fa-film mr-3"></i>Rakuten Movies 🎬
+                                </h3>
+                                <div class="flex gap-2">
+                                    <button onclick="app.filterMovies('action')" class="px-3 py-1 bg-purple-800 hover:bg-purple-700 rounded-full text-sm">أكشن</button>
+                                    <button onclick="app.filterMovies('comedy')" class="px-3 py-1 bg-purple-800 hover:bg-purple-700 rounded-full text-sm">كوميديا</button>
+                                    <button onclick="app.filterMovies('drama')" class="px-3 py-1 bg-purple-800 hover:bg-purple-700 rounded-full text-sm">دراما</button>
+                                    <button onclick="app.toggleCollapse('movies-section')" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 rounded-full text-sm">
+                                        <i class="fas fa-chevron-up"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="movies-section" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                <!-- سيتم ملؤها بالجافاسكريبت -->
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- Right Column: Sidebar -->
+                <div class="space-y-6">
+                    <!-- Favorites -->
+                    <div class="glass-effect rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-yellow-400">
+                                <i class="fas fa-star mr-3"></i>قنواتي المفضلة
+                            </h3>
+                            <span id="favorites-count" class="bg-yellow-900/30 px-3 py-1 rounded-full text-sm">0</span>
+                        </div>
+                        
+                        <div id="favorites-container" class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                            <div class="text-center text-gray-400 py-8">
+                                <i class="fas fa-heart text-3xl mb-4 block"></i>
+                                <p class="mb-2">لم تقم بإضافة قنوات مفضلة بعد</p>
+                                <p class="text-sm">اضغط على ♡ في أي قناة لإضافتها هنا</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Chat -->
+                    <div class="glass-effect rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-cyan-400">
+                                <i class="fas fa-comments mr-3"></i>الشات المباشر
+                            </h3>
+                            <div class="flex items-center space-x-2">
+                                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                                <span class="text-sm" id="chat-users">12 متصل</span>
+                            </div>
+                        </div>
+                        
+                        <div id="chat-container" class="space-y-3 mb-4 max-h-64 overflow-y-auto pr-2">
+                            <div class="text-center text-gray-400 py-6">
+                                <i class="fas fa-comment-dots text-2xl mb-3 block"></i>
+                                <p>ابدأ المحادثة مع المشاهدين الآخرين</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            <input id="chat-input" type="text" placeholder="اكتب رسالتك..." 
+                                   class="flex-1 bg-gray-900/50 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500">
+                            <button onclick="app.sendMessage()" class="bg-gradient-to-r from-cyan-600 to-blue-600 px-5 rounded-xl font-bold hover:opacity-90 transition">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="glass-effect rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-green-400 mb-6">
+                            <i class="fas fa-bolt mr-3"></i>إجراءات سريعة
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="app.quickAction('quality')" class="p-4 bg-gradient-to-br from-blue-900/30 to-cyan-900/30 rounded-xl hover:from-blue-800/30 hover:to-cyan-800/30 transition border border-blue-500/20">
+                                <i class="fas fa-tachometer-alt text-2xl mb-2 block"></i>
+                                <span class="text-sm">تغيير الجودة</span>
+                            </button>
+                            <button onclick="app.quickAction('capture')" class="p-4 bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-xl hover:from-purple-800/30 hover:to-pink-800/30 transition border border-purple-500/20">
+                                <i class="fas fa-camera text-2xl mb-2 block"></i>
+                                <span class="text-sm">لقطة شاشة</span>
+                            </button>
+                            <button onclick="app.quickAction('share')" class="p-4 bg-gradient-to-br from-green-900/30 to-emerald-900/30 rounded-xl hover:from-green-800/30 hover:to-emerald-800/30 transition border border-green-500/20">
+                                <i class="fas fa-share-alt text-2xl mb-2 block"></i>
+                                <span class="text-sm">مشاركة</span>
+                            </button>
+                            <button onclick="app.quickAction('settings')" class="p-4 bg-gradient-to-br from-yellow-900/30 to-orange-900/30 rounded-xl hover:from-yellow-800/30 hover:to-orange-800/30 transition border border-yellow-500/20">
+                                <i class="fas fa-cog text-2xl mb-2 block"></i>
+                                <span class="text-sm">الإعدادات</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-12 pt-8 pb-6 border-t border-gray-800/50 bg-gray-900/30">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                    <div>
+                        <h4 class="text-lg font-bold mb-4 gradient-text">عن المنصة</h4>
+                        <p class="text-gray-400 text-sm">
+                            منصة Mouse Streaming Hub توفر خدمة البث المباشر للقنوات الرياضية والأفلام بجودة عالية مع واجهة مستخدم عربية متكاملة.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-bold mb-4 gradient-text">روابط سريعة</h4>
+                        <div class="space-y-2">
+                            <a href="#" class="block text-gray-400 hover:text-cyan-400 transition text-sm">حول التطبيق</a>
+                            <a href="#" class="block text-gray-400 hover:text-cyan-400 transition text-sm">الدعم الفني</a>
+                            <a href="#" class="block text-gray-400 hover:text-cyan-400 transition text-sm">سياسة الخصوصية</a>
+                            <a href="#" class="block text-gray-400 hover:text-cyan-400 transition text-sm">شروط الاستخدام</a>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-bold mb-4 gradient-text">تواصل معنا</h4>
+                        <div class="flex space-x-4">
+                            <a href="#" class="text-gray-400 hover:text-blue-400 transition">
+                                <i class="fab fa-telegram text-xl"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-blue-500 transition">
+                                <i class="fab fa-twitter text-xl"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-red-500 transition">
+                                <i class="fab fa-youtube text-xl"></i>
+                            </a>
+                            <a href="https://github.com" class="text-gray-400 hover:text-white transition">
+                                <i class="fab fa-github text-xl"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center pt-6 border-t border-gray-800">
+                    <p class="text-gray-400 text-sm">
+                        🐭 MOUSE STREAMING HUB © 2024 | جميع الحقوق محفوظة | v2.0.0
+                    </p>
+                    <p class="text-gray-500 text-xs mt-2">
+                        هذا التطبيق للاستخدام الشخصي والتعليمي فقط
+                    </p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Tutorial Modal -->
+    <div id="tutorial-modal" class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-gradient-to-br from-gray-900 to-blue-900 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-8">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-2xl font-bold gradient-text">🎓 دليل استخدام المنصة</h3>
+                    <button onclick="app.closeTutorial()" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-cyan-900/30 p-3 rounded-xl">
+                            <i class="fas fa-play text-cyan-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">كيفية تشغيل القنوات</h4>
+                            <p class="text-gray-300">اضغط على أي قناة من القائمة لبدء التشغيل المباشر. يمكنك التحكم في المشغل باستخدام الأزرار المعتادة.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-yellow-900/30 p-3 rounded-xl">
+                            <i class="fas fa-star text-yellow-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">إضافة القنوات للمفضلة</h4>
+                            <p class="text-gray-300">اضغط على زر القلب ♡ في أي قناة لإضافتها إلى المفضلة. يمكنك الوصول السريع للقنوات المفضلة من الشريط الجانبي.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-purple-900/30 p-3 rounded-xl">
+                            <i class="fas fa-comments text-purple-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">الشات التفاعلي</h4>
+                            <p class="text-gray-300">يمكنك الدردشة مع المشاهدين الآخرين من خلال قسم الشات. اكتب رسالتك في الحقل المخصص واضغط إرسال.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8 pt-6 border-t border-gray-800">
+                    <button onclick="app.closeTutorial()" class="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-full font-bold hover:opacity-90 transition">
+                        فهمت، دعنا نبدأ! 🚀
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // تطبيق Mouse Streaming Hub المتكامل
+        class MouseStreamApp {
+            constructor() {
+                this.channels = [];
+                this.favorites = JSON.parse(localStorage.getItem('ms_favorites')) || [];
+                this.currentChannel = null;
+                this.hls = null;
+                this.theme = localStorage.getItem('ms_theme') || 'dark';
+                this.chatMessages = [];
+                this.onlineUsers = 12;
+                
+                this.init();
+            }
+
+            async init() {
+                // تحميل التطبيق
+                await this.simulateLoading();
+                await this.loadAllChannels();
+                
+                // تهيئة الواجهة
+                this.initUI();
+                this.bindEvents();
+                this.updateStats();
+                
+                // بدء التطبيق
+                this.startApp();
+            }
+
+            simulateLoading() {
+                return new Promise((resolve) => {
+                    let progress = 0;
+                    const progressBar = document.getElementById('progress-bar');
+                    const loadingText = document.getElementById('loading-text');
+                    const texts = [
+                        'جاري تحميل القنوات...',
+                        'جاري تهيئة المشغل...',
+                        'جاري تحميل الواجهة...',
+                        'جاري الاتصال بالخوادم...',
+                        'جاهز للاستخدام!'
+                    ];
+                    let textIndex = 0;
+
+                    const interval = setInterval(() => {
+                        progress += Math.random() * 10 + 5;
+                        if (progress > 100) progress = 100;
+                        progressBar.style.width = `${progress}%`;
+                        
+                        // تغيير نص التحميل كل 20%
+                        if (progress >= (textIndex + 1) * 20 && textIndex < texts.length - 1) {
+                            textIndex++;
+                            loadingText.textContent = texts[textIndex];
+                        }
+                        
+                        if (progress >= 100) {
+                            clearInterval(interval);
+                            setTimeout(resolve, 500);
+                        }
+                    }, 150);
+                });
+            }
+
+            async loadAllChannels() {
+                // جميع القنوات المطلوبة
+                this.channels = [
+                    // beIN SPORTS MAX 1
+                    { id: 1, name: "beIN SPORTS Max 1 4K", category: "sports", quality: "4K", language: "AR", 
+                      logo: "🏆", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432904.m3u8", group: "bein" },
+                    { id: 2, name: "beIN SPORTS Max 1 FHD", category: "sports", quality: "FHD", language: "AR", 
+                      logo: "⚽", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432903.m3u8", group: "bein" },
+                    { id: 3, name: "beIN SPORTS Max 1 HD", category: "sports", quality: "HD", language: "AR", 
+                      logo: "📺", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432902.m3u8", group: "bein" },
+                    { id: 4, name: "beIN SPORTS Max 1 SD", category: "sports", quality: "SD", language: "AR", 
+                      logo: "📡", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432901.m3u8", group: "bein" },
+
+                    // beIN SPORTS MAX 2
+                    { id: 5, name: "beIN SPORTS Max 2 4K", category: "sports", quality: "4K", language: "AR", 
+                      logo: "🏆", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432900.m3u8", group: "bein" },
+                    { id: 6, name: "beIN SPORTS Max 2 FHD", category: "sports", quality: "FHD", language: "AR", 
+                      logo: "⚽", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432899.m3u8", group: "bein" },
+                    { id: 7, name: "beIN SPORTS Max 2 HD", category: "sports", quality: "HD", language: "AR", 
+                      logo: "📺", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432898.m3u8", group: "bein" },
+                    { id: 8, name: "beIN SPORTS Max 2 SD", category: "sports", quality: "SD", language: "AR", 
+                      logo: "📡", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432897.m3u8", group: "bein" },
+
+                    // beIN SPORTS MAX 3
+                    { id: 9, name: "beIN SPORTS Max 3 4K", category: "sports", quality: "4K", language: "EN", 
+                      logo: "🏆", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432896.m3u8", group: "bein" },
+                    { id: 10, name: "beIN SPORTS Max 3 FHD", category: "sports", quality: "FHD", language: "EN", 
+                      logo: "⚽", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432895.m3u8", group: "bein" },
+                    { id: 11, name: "beIN SPORTS Max 3 HD", category: "sports", quality: "HD", language: "EN", 
+                      logo: "📺", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432894.m3u8", group: "bein" },
+                    { id: 12, name: "beIN SPORTS Max 3 SD", category: "sports", quality: "SD", language: "AR", 
+                      logo: "📡", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432893.m3u8", group: "bein" },
+
+                    // beIN SPORTS MAX 4
+                    { id: 13, name: "beIN SPORTS MAX 4 4K", category: "sports", quality: "4K", language: "FR", 
+                      logo: "🏆", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432892.m3u8", group: "bein" },
+                    { id: 14, name: "beIN SPORTS MAX 4 FHD", category: "sports", quality: "FHD", language: "FR", 
+                      logo: "⚽", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432891.m3u8", group: "bein" },
+                    { id: 15, name: "beIN SPORTS MAX 4 HD", category: "sports", quality: "HD", language: "FR", 
+                      logo: "📺", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432890.m3u8", group: "bein" },
+                    { id: 16, name: "beIN SPORTS MAX 4 SD", category: "sports", quality: "SD", language: "FR", 
+                      logo: "📡", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432889.m3u8", group: "bein" },
+
+                    // Algerian Channels
+                    { id: 17, name: "PROGRAMME NATIONAL ALGÉRIE HD", category: "arabic", quality: "HD", language: "DZ", 
+                      logo: "🇩🇿", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432888.m3u8", group: "algerian" },
+                    { id: 18, name: "EL BILAD TV", category: "arabic", quality: "HD", language: "DZ", 
+                      logo: "📺", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/351100.m3u8", group: "algerian" },
+                    { id: 19, name: "ALGERIE 6", category: "arabic", quality: "HD", language: "DZ", 
+                      logo: "6️⃣", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/327314.m3u8", group: "algerian" },
+                    { id: 20, name: "ALGERIE 8", category: "arabic", quality: "HD", language: "DZ", 
+                      logo: "8️⃣", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/295979.m3u8", group: "algerian" },
+                    { id: 21, name: "AL 24 NEWS", category: "arabic", quality: "HD", language: "DZ", 
+                      logo: "📰", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/295221.m3u8", group: "algerian" },
+                    { id: 22, name: "ALGERIE 7", category: "arabic", quality: "HD", language: "DZ", 
+                      logo: "7️⃣", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/152921.m3u8", group: "algerian" },
+                    { id: 23, name: "CANAL ALGERIE", category: "arabic", quality: "HD", language: "DZ", 
+                      logo: "🇩🇿", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/1687.m3u8", group: "algerian" },
+                    { id: 24, name: "A3 ALGERIE", category: "arabic", quality: "HD", language: "DZ", 
+                      logo: "A3", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/1675.m3u8", group: "algerian" },
+
+                    // Rakuten Movies - Action
+                    { id: 25, name: "Action Movies UK", category: "movies", quality: "FHD", language: "EN", 
+                      logo: "💥", url: "https://54045f0c40fd442c8b06df076aaf1e85.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6065/master.m3u8", group: "rakuten", subcategory: "action" },
+                    { id: 26, name: "Action Movies Finland", category: "movies", quality: "FHD", language: "FI", 
+                      logo: "💥", url: "https://bca5a421a70c46ad911efd0a4767c4bf.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6075/master.m3u8", group: "rakuten", subcategory: "action" },
+                    { id: 27, name: "Action Movies Germany", category: "movies", quality: "FHD", language: "DE", 
+                      logo: "💥", url: "https://284824cf70404fdfb6ddf9349009c710.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6066/master.m3u8", group: "rakuten", subcategory: "action" },
+                    { id: 28, name: "Action Movies Italy", category: "movies", quality: "FHD", language: "IT", 
+                      logo: "💥", url: "https://87f2e2e5e7624e3bad85da1ca2ed31a7.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6067/master.m3u8", group: "rakuten", subcategory: "action" },
+                    { id: 29, name: "Action Movies Spain", category: "movies", quality: "FHD", language: "ES", 
+                      logo: "💥", url: "https://a9c57ec7ec5e4b7daeacc6316a0bb404.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6069/master.m3u8", group: "rakuten", subcategory: "action" },
+
+                    // Rakuten Movies - Comedy
+                    { id: 30, name: "Comedy Movies UK", category: "movies", quality: "FHD", language: "EN", 
+                      logo: "😂", url: "https://9be783d652cd4b099cf63e1dc134c4a3.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6181/master.m3u8", group: "rakuten", subcategory: "comedy" },
+                    { id: 31, name: "Comedy Movies Finland", category: "movies", quality: "FHD", language: "FI", 
+                      logo: "😂", url: "https://a300af98e00746e2acf2346f43e47bd1.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6191/master.m3u8", group: "rakuten", subcategory: "comedy" },
+                    { id: 32, name: "Comedy Movies Germany", category: "movies", quality: "FHD", language: "DE", 
+                      logo: "😂", url: "https://ecac08c9e2214375b907d6825aaf9a01.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6182/master.m3u8", group: "rakuten", subcategory: "comedy" },
+                    { id: 33, name: "Comedy Movies Italy", category: "movies", quality: "FHD", language: "IT", 
+                      logo: "😂", url: "https://b8bc6c4b9be64bd6aeb3b92aa8521ed4.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6184/master.m3u8", group: "rakuten", subcategory: "comedy" },
+                    { id: 34, name: "Comedy Movies Spain", category: "movies", quality: "FHD", language: "ES", 
+                      logo: "😂", url: "https://71db867f03ce4d71a29e92155f07ab87.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6180/master.m3u8", group: "rakuten", subcategory: "comedy" },
+
+                    // Rakuten Movies - Drama
+                    { id: 35, name: "Drama Movies UK", category: "movies", quality: "FHD", language: "EN", 
+                      logo: "🎭", url: "https://fee09fd665814f51b939b6d106cf5f66.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6093/master.m3u8", group: "rakuten", subcategory: "drama" },
+                    { id: 36, name: "Drama Movies Finland", category: "movies", quality: "FHD", language: "FI", 
+                      logo: "🎭", url: "https://d7e8ee3c924d4305a0c1840fe94c5d36.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6102/master.m3u8", group: "rakuten", subcategory: "drama" },
+                    { id: 37, name: "Drama Movies Germany", category: "movies", quality: "FHD", language: "DE", 
+                      logo: "🎭", url: "https://968754c2483045c1a9a7f677caec35b6.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6096/master.m3u8", group: "rakuten", subcategory: "drama" },
+                    { id: 38, name: "Drama Movies Italy", category: "movies", quality: "FHD", language: "IT", 
+                      logo: "🎭", url: "https://f84e0b1628464fab846160df957f269e.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6094/master.m3u8", group: "rakuten", subcategory: "drama" },
+                    { id: 39, name: "Drama Movies Spain", category: "movies", quality: "FHD", language: "ES", 
+                      logo: "🎭", url: "https://a7089c89d85f453d850c4a1518b43076.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6092/master.m3u8", group: "rakuten", subcategory: "drama" },
+
+                    // Rakuten Movies - Top Movies
+                    { id: 40, name: "Top Movies UK", category: "movies", quality: "FHD", language: "EN", 
+                      logo: "🏆", url: "https://0145451975a64b35866170fd2e8fa486.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-5987/master.m3u8", group: "rakuten", subcategory: "top" },
+                    { id: 41, name: "Top Movies Finland", category: "movies", quality: "FHD", language: "FI", 
+                      logo: "🏆", url: "https://1d1b0d4cb6ae4c31985d13221795695b.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6057/master.m3u8", group: "rakuten", subcategory: "top" },
+                    { id: 42, name: "Top Movies Germany", category: "movies", quality: "FHD", language: "DE", 
+                      logo: "🏆", url: "https://cbb622b29f5d43b598991f3fa19de291.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-5985/master.m3u8", group: "rakuten", subcategory: "top" },
+                    { id: 43, name: "Top Movies Italy", category: "movies", quality: "FHD", language: "IT", 
+                      logo: "🏆", url: "https://0145451975a64b35866170fd2e8fa486.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-5987/master.m3u8", group: "rakuten", subcategory: "top" },
+
+                    // Additional Channels
+                    { id: 44, name: "Nordic Films", category: "movies", quality: "FHD", language: "EN", 
+                      logo: "❄️", url: "https://4aa9ef08b70d4b0c8f3519c5950b1930.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6303/master.m3u8", group: "rakuten", subcategory: "top" },
+                    { id: 45, name: "CANAL+ CAN HD", category: "sports", quality: "HD", language: "FR", 
+                      logo: "➕", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432884.m3u8", group: "other" },
+                    { id: 46, name: "beIN SPORTS 1 HD", category: "sports", quality: "HD", language: "FR", 
+                      logo: "1️⃣", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432883.m3u8", group: "other" },
+                    { id: 47, name: "beIN SPORTS 2 HD", category: "sports", quality: "HD", language: "FR", 
+                      logo: "2️⃣", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432882.m3u8", group: "other" },
+                    { id: 48, name: "LALIGA+ TV HD", category: "sports", quality: "HD", language: "ES", 
+                      logo: "⚽", url: "http://fr.ottv.pro/live/4476647188407159/4476647188407159/432881.m3u8", group: "other" }
+                ];
+
+                // عرض القنوات
+                this.renderChannelsByGroup();
+                this.renderFavorites();
+            }
+
+            renderChannelsByGroup() {
+                // عرض قنوات beIN
+                const beinContainer = document.getElementById('bein-section');
+                beinContainer.innerHTML = '';
+                
+                const beinChannels = this.channels.filter(c => c.group === 'bein');
+                beinChannels.forEach(channel => {
+                    beinContainer.appendChild(this.createChannelCard(channel));
+                });
+
+                // عرض القنوات الجزائرية
+                const algerianContainer = document.getElementById('algerian-section');
+                algerianContainer.innerHTML = '';
+                
+                const algerianChannels = this.channels.filter(c => c.group === 'algerian');
+                algerianChannels.forEach(channel => {
+                    algerianContainer.appendChild(this.createChannelCard(channel));
+                });
+
+                // عرض أفلام Rakuten
+                const moviesContainer = document.getElementById('movies-section');
+                moviesContainer.innerHTML = '';
+                
+                const rakutenChannels = this.channels.filter(c => c.group === 'rakuten');
+                rakutenChannels.forEach(channel => {
+                    moviesContainer.appendChild(this.createChannelCard(channel));
+                });
+
+                // تحديث الإحصائيات
+                document.getElementById('total-channels').textContent = this.channels.length;
+            }
+
+            createChannelCard(channel) {
+                const isFavorite = this.favorites.includes(channel.id);
+                
+                const card = document.createElement('div');
+                card.className = `channel-card p-5 fade-in-up cursor-pointer ${channel.category === 'sports' ? 'category-sports' : channel.category === 'movies' ? 'category-movies' : 'category-arabic'}`;
+                card.onclick = () => this.playChannel(channel);
+                
+                const qualityClass = `quality-${channel.quality.toLowerCase()}`;
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="text-3xl">${channel.logo}</div>
+                        <button onclick="event.stopPropagation(); app.toggleFavorite(${channel.id})" 
+                                class="text-${isFavorite ? 'yellow' : 'gray'}-400 hover:text-yellow-300 transition">
+                            <i class="fas ${isFavorite ? 'fa-star' : 'fa-star'} text-lg"></i>
+                        </button>
+                    </div>
+                    
+                    <h4 class="font-bold text-sm mb-3 truncate">${channel.name}</h4>
+                    
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs px-2 py-1 ${qualityClass} rounded-full">
+                                ${channel.quality}
+                            </span>
+                            <span class="text-xs px-2 py-1 bg-gray-800 rounded-full">
+                                ${channel.language}
+                            </span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-gray-400">
+                                ${this.getCategoryName(channel.category)}
+                            </span>
+                            <span class="flex items-center text-xs">
+                                <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse mr-1"></span>
+                                مباشر
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-3 border-t border-gray-800/50">
+                        <button onclick="event.stopPropagation(); app.playChannel(${channel.id})" 
+                                class="w-full py-2 bg-gradient-to-r from-cyan-700 to-blue-700 hover:from-cyan-600 hover:to-blue-600 rounded-lg text-xs font-bold transition">
+                            <i class="fas fa-play mr-2"></i>تشغيل مباشر
+                        </button>
+                    </div>
+                `;
+                
+                return card;
+            }
+
+            getCategoryName(category) {
+                const categories = {
+                    'sports': 'رياضة',
+                    'movies': 'أفلام',
+                    'arabic': 'عربية'
+                };
+                return categories[category] || category;
+            }
+
+            playChannel(channel) {
+                this.currentChannel = channel;
+                
+                // تحديث واجهة المشغل
+                document.getElementById('player-placeholder').style.display = 'none';
+                document.getElementById('channel-info').style.display = 'block';
+                
+                document.getElementById('channel-logo').textContent = channel.logo;
+                document.getElementById('channel-name').textContent = channel.name;
+                document.getElementById('channel-quality').textContent = channel.quality;
+                document.getElementById('channel-quality').className = `px-3 py-1 ${this.getQualityClass(channel.quality)} rounded-full text-sm font-bold`;
+                document.getElementById('channel-category').textContent = this.getCategoryName(channel.category);
+                document.getElementById('channel-language').textContent = this.getLanguageName(channel.language);
+                
+                // تحديث زر المفضلة
+                const favBtn = document.getElementById('toggle-fav');
+                const isFavorite = this.favorites.includes(channel.id);
+                favBtn.innerHTML = `<i class="${isFavorite ? 'fas' : 'far'} fa-heart mr-2"></i>${isFavorite ? 'إزالة من' : 'إضافة إلى'} المفضلة`;
+                favBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    this.toggleFavorite(channel.id);
+                };
+                
+                // تشغيل الفيديو
+                this.playVideo(channel.url);
+                
+                // تحديث الإحصائيات
+                this.updateChannelStats();
+                
+                // إضافة رسالة في الشات
+                this.addChatMessage('system', `🔴 بدأ تشغيل: ${channel.name} (${channel.quality})`);
+                
+                // تحديث المشاهدين
+                this.updateViewers();
+            }
+
+            playVideo(url) {
+                const video = document.getElementById('video-player');
+                
+                // إيقاف أي تشغيل سابق
+                if (this.hls) {
+                    this.hls.destroy();
+                    this.hls = null;
+                }
+                
+                video.pause();
+                video.src = '';
+                
+                if (Hls.isSupported()) {
+                    this.hls = new Hls({
+                        enableWorker: true,
+                        lowLatencyMode: true,
+                        backBufferLength: 90,
+                        maxBufferLength: 30
+                    });
+                    
+                    this.hls.loadSource(url);
+                    this.hls.attachMedia(video);
+                    
+                    this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        video.play().catch(e => console.log('Auto-play prevented:', e));
+                        
+                        // تحديث معلومات الجودة
+                        const levels = this.hls.levels;
+                        if (levels && levels.length > 0) {
+                            const maxQuality = levels[levels.length - 1];
+                            document.getElementById('resolution').textContent = 
+                                `${maxQuality.width || '--'}×${maxQuality.height || '--'}`;
+                            document.getElementById('bitrate').textContent = 
+                                maxQuality.bitrate ? `${Math.round(maxQuality.bitrate/1000)} kbps` : '--';
+                        }
+                    });
+                    
+                    this.hls.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
+                        const level = this.hls.levels[data.level];
+                        document.getElementById('resolution').textContent = 
+                            `${level.width || '--'}×${level.height || '--'}`;
+                        document.getElementById('bitrate').textContent = 
+                            level.bitrate ? `${Math.round(level.bitrate/1000)} kbps` : '--';
+                    });
+                    
+                    this.hls.on(Hls.Events.BUFFER_CREATED, () => {
+                        const buffer = this.hls.bufferLength;
+                        document.getElementById('buffer').textContent = `${buffer.toFixed(1)}s`;
+                    });
+                    
+                    this.hls.on(Hls.Events.ERROR, (event, data) => {
+                        console.error('HLS Error:', data);
+                        if (data.fatal) {
+                            switch (data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    this.addChatMessage('system', '⚠️ خطأ في الشبكة، جاري إعادة المحاولة...');
+                                    this.hls.startLoad();
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    this.addChatMessage('system', '⚠️ خطأ في الوسائط');
+                                    this.hls.recoverMediaError();
+                                    break;
+                                default:
+                                    this.hls.destroy();
+                                    this.addChatMessage('system', '❌ خطأ في التشغيل، جرب قناة أخرى');
+                                    break;
+                            }
+                        }
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    // دعم Safari
+                    video.src = url;
+                    video.addEventListener('loadedmetadata', () => {
+                        video.play().catch(e => console.log('Auto-play prevented:', e));
+                        document.getElementById('resolution').textContent = 
+                            `${video.videoWidth || '--'}×${video.videoHeight || '--'}`;
+                    });
+                } else {
+                    this.addChatMessage('system', '❌ المتصفح غير مدعوم لتشغيل هذا النوع من الفيديو');
+                }
+            }
+
+            getQualityClass(quality) {
+                const classes = {
+                    '4K': 'quality-4k',
+                    'FHD': 'quality-fhd',
+                    'HD': 'quality-hd',
+                    'SD': 'quality-sd'
+                };
+                return classes[quality] || 'quality-sd';
+            }
+
+            getLanguageName(code) {
+                const languages = {
+                    'AR': 'عربي',
+                    'EN': 'إنجليزي',
+                    'FR': 'فرنسي',
+                    'ES': 'إسباني',
+                    'DE': 'ألماني',
+                    'IT': 'إيطالي',
+                    'FI': 'فنلندي',
+                    'DZ': 'جزائري'
+                };
+                return languages[code] || code;
+            }
+
+            toggleFavorite(channelId) {
+                const index = this.favorites.indexOf(channelId);
+                
+                if (index > -1) {
+                    this.favorites.splice(index, 1);
+                    this.addChatMessage('system', 'تمت إزالة القناة من المفضلة');
+                } else {
+                    this.favorites.push(channelId);
+                    this.addChatMessage('system', 'تمت إضافة القناة إلى المفضلة');
+                }
+                
+                localStorage.setItem('ms_favorites', JSON.stringify(this.favorites));
+                this.renderChannelsByGroup();
+                this.renderFavorites();
+                
+                // تحديث زر المفضلة إذا كانت القناة الحالية هي نفسها
+                if (this.currentChannel && this.currentChannel.id === channelId) {
+                    const favBtn = document.getElementById('toggle-fav');
+                    const isFavorite = this.favorites.includes(channelId);
+                    favBtn.innerHTML = `<i class="${isFavorite ? 'fas' : 'far'} fa-heart mr-2"></i>${isFavorite ? 'إزالة من' : 'إضافة إلى'} المفضلة`;
+                }
+            }
+
+            renderFavorites() {
+                const container = document.getElementById('favorites-container');
+                const countElement = document.getElementById('favorites-count');
+                
+                countElement.textContent = this.favorites.length;
+                
+                if (this.favorites.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center text-gray-400 py-8">
+                            <i class="fas fa-heart text-3xl mb-4 block"></i>
+                            <p class="mb-2">لم تقم بإضافة قنوات مفضلة بعد</p>
+                            <p class="text-sm">اضغط على ♡ في أي قناة لإضافتها هنا</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = '';
+                this.favorites.forEach(favId => {
+                    const channel = this.channels.find(c => c.id === favId);
+                    if (channel) {
+                        const item = document.createElement('div');
+                        item.className = 'flex items-center justify-between p-3 bg-gray-900/30 rounded-xl hover:bg-gray-900/50 cursor-pointer transition';
+                        item.onclick = () => this.playChannel(channel);
+                        
+                        item.innerHTML = `
+                            <div class="flex items-center space-x-3">
+                                <div class="text-xl">${channel.logo}</div>
+                                <div class="text-right flex-1">
+                                    <h4 class="font-bold text-sm truncate">${channel.name}</h4>
+                                    <p class="text-xs text-gray-400">${channel.quality} • ${this.getLanguageName(channel.language)}</p>
+                                </div>
+                            </div>
+                            <button onclick="event.stopPropagation(); app.toggleFavorite(${channel.id})" 
+                                    class="text-yellow-400 hover:text-yellow-300">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                        
+                        container.appendChild(item);
+                    }
+                });
+            }
+
+            addChatMessage(sender, text) {
+                const container = document.getElementById('chat-container');
+                const isSystem = sender === 'system';
+                
+                const message = document.createElement('div');
+                message.className = `fade-in-up ${isSystem ? 'text-center' : ''}`;
+                
+                if (isSystem) {
+                    message.innerHTML = `
+                        <div class="text-xs text-gray-400 bg-gray-900/50 rounded-full px-4 py-2 inline-block max-w-full">
+                            ${text}
+                        </div>
+                    `;
+                } else {
+                    const isUser = sender === 'user';
+                    message.innerHTML = `
+                        <div class="flex ${isUser ? 'justify-end' : 'justify-start'}">
+                            <div class="max-w-[80%] ${isUser ? 'bg-gradient-to-l from-cyan-900/30 to-blue-900/30' : 'bg-gray-900/30'} rounded-2xl p-3">
+                                <div class="text-xs ${isUser ? 'text-cyan-300' : 'text-yellow-300'} mb-1 flex justify-between">
+                                    <span>${isUser ? 'أنت' : 'مستخدم'}</span>
+                                    <span class="text-gray-500">${new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}</span>
+                                </div>
+                                <div class="text-sm">${text}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                container.appendChild(message);
+                container.scrollTop = container.scrollHeight;
+            }
+
+            sendMessage() {
+                const input = document.getElementById('chat-input');
+                const message = input.value.trim();
+                
+                if (!message) return;
+                
+                this.addChatMessage('user', message);
+                input.value = '';
+                
+                // محاكاة ردود من مستخدمين آخرين
+                setTimeout(() => {
+                    const replies = [
+                        'شكراً على المشاركة!',
+                        'أي قناة تشاهد الآن؟',
+                        'الجودة اليوم رائعة!',
+                        'هل أعجبك البث؟',
+                        'أهلاً وسهلاً',
+                        'متى بدأ المباراة؟',
+                        'فيلم رائع اليوم'
+                    ];
+                    const reply = replies[Math.floor(Math.random() * replies.length)];
+                    this.addChatMessage('other', reply);
+                    
+                    // زيادة عدد المستخدمين المتصلين
+                    this.onlineUsers += Math.floor(Math.random() * 3);
+                    this.updateOnlineUsers();
+                }, 1000 + Math.random() * 2000);
+            }
+
+            updateOnlineUsers() {
+                document.getElementById('chat-users').textContent = `${this.onlineUsers} متصل`;
+                document.getElementById('online-count').textContent = this.onlineUsers;
+            }
+
+            updateChannelStats() {
+                // محاكاة إحصائيات القناة
+                if (this.currentChannel) {
+                    const viewers = Math.floor(Math.random() * 1000) + 500;
+                    document.getElementById('viewers').textContent = viewers.toLocaleString();
+                    
+                    setInterval(() => {
+                        const change = Math.floor(Math.random() * 100) - 50;
+                        const newViewers = Math.max(100, viewers + change);
+                        document.getElementById('viewers').textContent = newViewers.toLocaleString();
+                    }, 10000);
+                }
+            }
+
+            updateViewers() {
+                // تحديث عدد المشاهدين كل 10 ثوانٍ
+                setInterval(() => {
+                    if (this.currentChannel) {
+                        const change = Math.floor(Math.random() * 50) - 25;
+                        const current = parseInt(document.getElementById('viewers').textContent.replace(/,/g, ''));
+                        const newViewers = Math.max(100, current + change);
+                        document.getElementById('viewers').textContent = newViewers.toLocaleString();
+                    }
+                }, 10000);
+            }
+
+            updateStats() {
+                // تحديث الإحصائيات العامة
+                setInterval(() => {
+                    this.onlineUsers += Math.floor(Math.random() * 5) - 2;
+                    this.onlineUsers = Math.max(5, Math.min(100, this.onlineUsers));
+                    this.updateOnlineUsers();
+                }, 30000);
+            }
+
+            initUI() {
+                // إظهار التطبيق
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                
+                // إضافة رسائل ترحيب
+                setTimeout(() => {
+                    this.addChatMessage('system', '🎉 مرحباً بك في MOUSE STREAMING HUB!');
+                    this.addChatMessage('system', '👈 اختر قناة من القائمة لبدء المشاهدة');
+                    this.addChatMessage('system', '⭐ اضغط على ♡ لإضافة القنوات للمفضلة');
+                }, 1000);
+            }
+
+            bindEvents() {
+                // Service Worker
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('sw.js')
+                        .then(() => console.log('Service Worker installed'))
+                        .catch(err => console.log('SW error:', err));
+                }
+                
+                // زر التثبيت
+                let deferredPrompt;
+                const installBtn = document.getElementById('install-btn');
+                
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    deferredPrompt = e;
+                    installBtn.classList.remove('hidden');
+                    
+                    installBtn.onclick = () => {
+                        installBtn.classList.add('hidden');
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then(() => {
+                            deferredPrompt = null;
+                        });
+                    };
+                });
+                
+                // بحث القنوات
+                const searchInput = document.getElementById('search-channels');
+                searchInput.addEventListener('input', (e) => {
+                    const query = e.target.value.toLowerCase();
+                    this.searchChannels(query);
+                });
+                
+                // إدخال الشات
+                const chatInput = document.getElementById('chat-input');
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendMessage();
+                });
+                
+                // تغيير السمة
+                document.getElementById('theme-toggle').addEventListener('click', () => this.toggleTheme());
+            }
+
+            toggleTheme() {
+                this.theme = this.theme === 'dark' ? 'light' : 'dark';
+                localStorage.setItem('ms_theme', this.theme);
+                
+                const themeIcon = document.querySelector('#theme-toggle i');
+                themeIcon.className = this.theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+                
+                if (this.theme === 'light') {
+                    document.body.classList.add('bg-gray-100');
+                    document.body.classList.remove('bg-gradient-to-br', 'from-gray-900', 'via-blue-900', 'to-black');
+                } else {
+                    document.body.classList.remove('bg-gray-100');
+                    document.body.classList.add('bg-gradient-to-br', 'from-gray-900', 'via-blue-900', 'to-black');
+                }
+            }
+
+            searchChannels(query) {
+                if (!query) {
+                    this.renderChannelsByGroup();
+                    return;
+                }
+                
+                const filtered = this.channels.filter(channel => 
+                    channel.name.toLowerCase().includes(query) ||
+                    channel.category.toLowerCase().includes(query) ||
+                    channel.language.toLowerCase().includes(query) ||
+                    channel.quality.toLowerCase().includes(query)
+                );
+                
+                // تحديث العرض
+                const containers = ['bein-section', 'algerian-section', 'movies-section'];
+                containers.forEach(containerId => {
+                    const container = document.getElementById(containerId);
+                    container.innerHTML = '';
+                });
+                
+                filtered.forEach(channel => {
+                    // إضافة القناة للقسم المناسب
+                    let containerId;
+                    if (channel.group === 'bein') containerId = 'bein-section';
+                    else if (channel.group === 'algerian') containerId = 'algerian-section';
+                    else containerId = 'movies-section';
+                    
+                    const container = document.getElementById(containerId);
+                    if (container) {
+                        container.appendChild(this.createChannelCard(channel));
+                    }
+                });
+            }
+
+            playDemo() {
+                // تشغيل فيديو تجريبي
+                const demoChannel = this.channels[25]; // Action Movies UK
+                this.playChannel(demoChannel);
+                this.addChatMessage('system', '🎬 بدأ تشغيل فيديو تجريبي');
+            }
+
+            showTutorial() {
+                document.getElementById('tutorial-modal').classList.remove('hidden');
+            }
+
+            closeTutorial() {
+                document.getElementById('tutorial-modal').classList.add('hidden');
+            }
+
+            toggleFullscreen() {
+                const video = document.getElementById('video-player');
+                if (!document.fullscreenElement) {
+                    if (video.requestFullscreen) {
+                        video.requestFullscreen();
+                    } else if (video.webkitRequestFullscreen) {
+                        video.webkitRequestFullscreen();
+                    } else if (video.mozRequestFullScreen) {
+                        video.mozRequestFullScreen();
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    }
+                }
+            }
+
+            toggleCollapse(sectionId) {
+                const section = document.getElementById(sectionId);
+                const button = event.currentTarget;
+                const icon = button.querySelector('i');
+                
+                if (section.style.display === 'none') {
+                    section.style.display = 'grid';
+                    icon.className = 'fas fa-chevron-up';
+                } else {
+                    section.style.display = 'none';
+                    icon.className = 'fas fa-chevron-down';
+                }
+            }
+
+            filterChannels(category) {
+                // تحديث أزرار التصفية
+                document.querySelectorAll('#channels-grid button.active').forEach(btn => {
+                    btn.classList.remove('active', 'bg-cyan-600');
+                    btn.classList.add('bg-gray-800');
+                });
+                
+                event.currentTarget.classList.add('active', 'bg-cyan-600');
+                event.currentTarget.classList.remove('bg-gray-800');
+                
+                // عرض القنوات حسب التصنيف
+                if (category === 'all') {
+                    this.renderChannelsByGroup();
+                } else {
+                    const filtered = this.channels.filter(c => c.category === category);
+                    
+                    // تحديث جميع الأقسام
+                    const containers = ['bein-section', 'algerian-section', 'movies-section'];
+                    containers.forEach(containerId => {
+                        const container = document.getElementById(containerId);
+                        container.innerHTML = '';
+                    });
+                    
+                    filtered.forEach(channel => {
+                        let containerId;
+                        if (channel.group === 'bein') containerId = 'bein-section';
+                        else if (channel.group === 'algerian') containerId = 'algerian-section';
+                        else containerId = 'movies-section';
+                        
+                        const container = document.getElementById(containerId);
+                        if (container) {
+                            container.appendChild(this.createChannelCard(channel));
+                        }
+                    });
+                }
+            }
+
+            filterMovies(subcategory) {
+                const filtered = this.channels.filter(c => 
+                    c.group === 'rakuten' && c.subcategory === subcategory
+                );
+                
+                const container = document.getElementById('movies-section');
+                container.innerHTML = '';
+                
+                filtered.forEach(channel => {
+                    container.appendChild(this.createChannelCard(channel));
+                });
+            }
+
+            sortChannels(criteria) {
+                let sorted;
+                if (criteria === 'quality') {
+                    const qualityOrder = { '4K': 4, 'FHD': 3, 'HD': 2, 'SD': 1 };
+                    sorted = [...this.channels].sort((a, b) => 
+                        qualityOrder[b.quality] - qualityOrder[a.quality]
+                    );
+                }
+                
+                // إعادة عرض القنوات
+                this.channels = sorted;
+                this.renderChannelsByGroup();
+            }
+
+            quickAction(action) {
+                const messages = {
+                    'quality': 'يمكنك تغيير الجودة من زر الجودة في المشغل',
+                    'capture': 'تم حفظ لقطة الشاشة',
+                    'share': 'مشاركة القناة متاحة قريباً',
+                    'settings': 'الإعدادات متاحة في النسخة القادمة'
+                };
+                
+                this.addChatMessage('system', `⚡ ${messages[action]}`);
+            }
+
+            startApp() {
+                console.log('🚀 Mouse Streaming Hub started successfully!');
+                console.log(`📺 Total channels loaded: ${this.channels.length}`);
+                console.log(`⭐ Favorites: ${this.favorites.length}`);
+                
+                // تحديث المستخدمين المتصلين
+                setInterval(() => this.updateOnlineUsers(), 15000);
+                
+                // تحديث عنوان الصفحة ديناميكياً
+                setInterval(() => {
+                    if (this.currentChannel) {
+                        document.title = `📺 ${this.currentChannel.name} | MOUSE STREAM`;
+                    }
+                }, 5000);
+            }
+        }
+
+        // بدء التطبيق
+        let app;
+        window.addEventListener('DOMContentLoaded', () => {
+            app = new MouseStreamApp();
+            window.app = app;
+        });
+    </script>
+</body>
+</html>
